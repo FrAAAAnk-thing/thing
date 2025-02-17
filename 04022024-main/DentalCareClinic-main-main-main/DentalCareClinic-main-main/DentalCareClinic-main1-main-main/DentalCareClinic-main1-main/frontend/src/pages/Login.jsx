@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 
 const Login = () => {
-
   const {backendURL, token, setToken} = useContext(AppContext)
 
   const navigate = useNavigate()
@@ -22,6 +21,7 @@ const Login = () => {
       event.preventDefault()
       console.log("Form data being submitted:", { fname, lname, email, password });
 
+      
       try{
         if(state === 'Sign Up' ){
           const {data} = await axios.post(`${backendURL}/api/user/register`, {fname, lname, password, email});

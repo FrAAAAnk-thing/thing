@@ -127,6 +127,18 @@ const updateProfile = async (req, res) => {
     }
 }
 
+//API to book appointment
 
+const bookAppointment = async (req,res)=>{
+    try{
+        
+        const{userId, slotDate, slotTime} = req.body
+
+    }
+    catch(error){
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
 
 export { registerUser, loginUser, getProfile, updateProfile }
