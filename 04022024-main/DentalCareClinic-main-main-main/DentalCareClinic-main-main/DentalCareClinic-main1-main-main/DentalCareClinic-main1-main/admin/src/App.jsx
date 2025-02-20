@@ -14,7 +14,11 @@ import DoctorsList from './pages/Admin/DoctorsList';
 const App = () => {
 
   const {aToken} = useContext(AdminContext)
-
+  const appointments = {
+    '2025-02-27':['Jaking it idk'],
+    '2025-02-25':['Finning it idk'],
+    '2025-02-20':['am tired']
+  }
   return aToken ? (
     <div className='bg-[#F8F9FD]'>
       <ToastContainer/>
@@ -38,5 +42,10 @@ const App = () => {
     </>
   )
 }
+
+export const appointments = {
+  '2025-2-27': ['Jaking it idk'],
+  '2025-2-25': ['Finning it idk'],
+};
 
 export default App
