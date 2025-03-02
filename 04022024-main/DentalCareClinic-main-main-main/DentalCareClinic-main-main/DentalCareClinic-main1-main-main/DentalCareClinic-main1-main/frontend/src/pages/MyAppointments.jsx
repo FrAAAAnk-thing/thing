@@ -1,37 +1,97 @@
 import React, { useContext } from 'react'
-import { AppContext } from '../context/AppContext'
+import { useState } from "react";
+import { DateTime, Info, Interval } from "luxon";
+import "./calendar.css";
+import { appointments } from "./../App";
+import classnames from "classnames"
+//import { AppContext } from '../context/AppContext'
 
 const MyAppointments = () => {
 
-  const { doctors } = useContext(AppContext)
+  const today = DateTime.local();
+  const [activeDay, setActiveDay] = useState(null);
+  const [firstDayofActiveMonth, setFirstDayofActiveMonth] = useState(today.startOf("month"));
 
+  // Fix the logic to get the appointments for the selected day.
+  const activeDayAppointments = activeDay
+    ? appointments[activeDay.toISODate()] ?? []
+    : [];
+
+  const weekDays = Info.weekdays("short");
+  const daysOfMonth = Interval.fromDateTimes(
+    firstDayofActiveMonth.startOf("week"),
+    firstDayofActiveMonth.endOf("month").endOf("week")
+  ).splitBy({ day: 1 }).map(day => day.start);
+
+  const goToPrevMonth = () => {
+    setFirstDayofActiveMonth(firstDayofActiveMonth.minus({ month: 1 }))
+  }
+  const goToNextMonth = () => {
+    setFirstDayofActiveMonth(firstDayofActiveMonth.plus({ month: 1 }))
+  }
+  const goToToday = () => {
+    setFirstDayofActiveMonth(today.startOf('month'))
+  }
   return (
-    <div>
-      <p className='pb-3 mt-12 font-medium text-zinc-700 border-b'>My appointments</p>
-      <div>
-        {doctors.slice(0,3).map((item,index)=>(
-            <div className='grid grid-cols-[1fr-2fr] gap-4 sm:flex sm:gap-6 py-2 border-b' key={index}>
+    <div className="m-5 max-h-[90vh] overflow-y-scroll">
+      <h1 className="text-lg font-medium">All Appointments</h1>
+      <br />
+      <div className="calendar-container">
+        <div className="calendar">
+          <div className="calendar-headline">
+            <div className="calendar-headline-month">
+              {firstDayofActiveMonth.monthShort}, {firstDayofActiveMonth.year}
+            </div>
+            <div className="calendar-headline-controls">
+              <div className="calendar-headline-control" onClick={goToPrevMonth}>←</div>
+              <div className="calendar-headline-control calendar-headline-controls-today" onClick={goToToday}>Today</div>
+              <div className="calendar-headline-control" onClick={goToNextMonth}>→</div>
+            </div>
+          </div>
+          <div className="calendar-weeks-grid">
+            {weekDays.map((weekDay, weekDayIndex) => (
+              <div key={weekDayIndex} className="calendar-weeks-grid-cell">{weekDay}</div>
+            ))}
+          </div>
+          <div className="calendar-grid">
+            {daysOfMonth.map((dayOfMonth, dayOfMonthIndex) => (
+              <div
+                key={dayOfMonthIndex}
+                className={classnames({
+                  'calendar-grid-cell': true,
+                  'calendar-grid-cell-inactive': dayOfMonth.month !== firstDayofActiveMonth.month,
+                  'calendar-grid-cell-active': activeDay?.toISODate() === dayOfMonth.toISODate(),
+                })}
+                onClick={() => setActiveDay(dayOfMonth)}
+              >
+                {dayOfMonth.day}
+              </div>
+            ))}
+          </div>
+          <div>
+            <div className="schedule">
+              <div className="schedule-headline">
+                {activeDay === null && <div> Please Select an Active Day </div>}
+                {activeDay && <div> {activeDay.toLocaleString(DateTime.DATE_MED)}</div>}
+              </div>
               <div>
-                <img className='w-32 bg-indigo-50' src={item.image} alt="" />
+                {activeDay && activeDayAppointments.length === 0 && (
+                  <div> No Appointments for Today! </div>
+                )}
+                {activeDay && activeDayAppointments.length > 0 && (
+                  <>
+                    {activeDayAppointments.map((appointment, appointmentIndex) => (
+                      <div key={appointmentIndex}>{appointment}</div> //NOT WORKING
+                    ))}
+                  </>
+                )}
+              </div>
             </div>
-            <div className='flex-1 text-sm text-zinc-600'>
-              <p className='text-neutral-800 font-semibold'>{item.name}</p>
-              <p>{item.speciality}</p>
-              <p className='text-zinc-700 font-medium mt-1'>Address:</p>
-              <p className='text-xs'>{item.address.line1}</p>
-              <p className='text-xs'>{item.address.line2}</p>
-              <p className='text-xs mt-1'><span className='text-sm text-neutral-700 font-medium'>Date & Time:</span> 25, July, 2024 | 8:30 PM</p>
-            </div>
-            <div></div>
-            <div className='flex flex-col gap-2 justify-end'>
-              <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300'>Cash Payment</button>
-              <button className='text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-red-600 hover:text-white transition-all duration-300'>Cancel Appointment</button> 
-            </div>
-            </div>
-          ))} 
+          </div>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default MyAppointments

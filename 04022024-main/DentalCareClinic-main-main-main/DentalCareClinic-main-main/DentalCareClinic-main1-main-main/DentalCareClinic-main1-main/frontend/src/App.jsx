@@ -14,6 +14,11 @@ import AppContextProvider from './context/AppContext'
 import { ToastContainer, toast } from 'react-toastify';
 
 const App = () => {
+    const appointments = {
+      '2025-02-27':['Jaking it idk'],
+      '2025-02-25':['Finning it idk'],
+      '2025-02-20':['am tired']
+    }
   return (
     <AppContextProvider>
       <ToastContainer/>
@@ -35,5 +40,11 @@ const App = () => {
     </AppContextProvider>
   )
 }
+
+export const appointments = {
+  '2025-2-27': ['Jaking it idk'],
+  '2025-2-25': ['Finning it idk'],
+};
+
 
 export default App
